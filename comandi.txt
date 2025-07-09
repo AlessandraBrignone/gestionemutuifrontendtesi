@@ -1,0 +1,6 @@
+
+cd gestioneMutuiBackend
+mvn spring-boot:run
+
+cd gestioneMutuiFrontend
+npm start

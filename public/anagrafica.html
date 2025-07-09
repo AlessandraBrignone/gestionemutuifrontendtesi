@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bri - Bank</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<section>
+<!--<section id="anagraficaSection">-->
+  <!-- Sezione Anagrafica -->
+  <h2 class="text-center">Anagrafica</h2>
+  <div class="container py-4">
+    <div class="text-right mt-3">
+      <button class="btn btn-success" id="btnNuovoInserimento">Nuovo Inserimento</button>
+    </div>
+    <h1 class="text-center mb-4">Ricerca anagrafica</h1>
+    <!-- Sezione Ricerca -->
+    <form id="formRicerca" class="mb-4">
+      <div class="row g-3">
+        <div class="col-md-4">
+          <label for="nomeRicerca" class="form-label">Nome</label>
+          <input type="text" class="form-control" id="nomeRicerca">
+        </div>
+        <div class="col-md-4">
+          <label for="cognomeRicerca" class="form-label">Cognome</label>
+          <input type="text" class="form-control" id="cognomeRicerca">
+        </div>
+        <div class="col-md-4">
+          <label for="codiceFiscaleRicerca" class="form-label">Codice Fiscale</label>
+          <input type="text" class="form-control" id="codiceFiscaleRicerca">
+        </div>
+      </div>
+      <div class="text-center mt-3">
+        <button type="button" class="btn btn-primary" id="btnRicerca">Cerca</button>
+      </div>
+    </form>
+
+    <!-- Risultati Ricerca -->
+    <div id="risultatiRicerca" style="display: none;">
+      <div id="tabellaRisultati" class="table-responsive" style="display: none;">
+        <table class="table table-bordered">
+          <thead>
+          <tr>
+            <th>Codice Fiscale</th>
+            <th>Nome</th>
+            <th>Cognome</th>
+            <th>Data di Nascita</th>
+            <th>Azione</th>
+          </tr>
+          </thead>
+          <tbody id="tbodyRisultati"></tbody>
+        </table>
+      </div>
+      <div id="nessunRisultato" class="alert alert-warning text-center" style="display: none;">
+        Nessun elemento presente.
+      </div>
+    </div>
+
+    <!-- Sezione Inserimento (inizialmente nascosta) -->
+    <div id="sezioneInserimento" style="display: none;">
+      <h2 class="text-center mb-4">Anagrafica</h2>
+
+      <form id="Anagrafica">
+        <table class="table table-bordered bg-light">
+          <!-- Dati Anagrafici -->
+          <tr><td colspan="2" class="table-section-title">Dati Anagrafici</td></tr>
+          <tr>
+            <td>
+              <label for="nome">Nome<span class="required">*</span></label>
+              <input class="form-control" name="nome" id="nome" />
+            </td>
+            <td>
+              <label for="cognome">Cognome<span class="required">*</span></label>
+              <input class="form-control" name="cognome" id="cognome" />
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <label for="codiceFiscale">Codice fiscale<span class="required">*</span></label>
+              <input class="form-control" name="codiceFiscale" id="codiceFiscale" />
+            </td>
+            <td>
+              <label for="selectComuneNascita">Comune di nascita<span class="required">*</span></label>
+              <select class="form-select" name="comuneNascita" id="selectComuneNascita">
+                <option value="">-- Seleziona --</option>
+              </select>
+            </td>
+          </tr>
+          <tr>
+            <td colspan="2">
+              <label for="dataNascita">Data di nascita<span class="required">*</span></label>
+              <input class="form-control" name="dataNascita" id="dataNascita" placeholder="gg/mm/aaaa"/>
+            </td>
+          </tr>
+
+          <!-- Contatti -->
+          <tr><td colspan="2" class="table-section-title">Contatti</td></tr>
+          <tr>
+            <td>
+              <label for="email">Email<span class="required">*</span></label>
+              <input class="form-control" name="email" id="email" />
+            </td>
+            <td>
+              <label for="telefono">Telefono</label>
+              <input class="form-control" name="telefono" id="telefono" />
+            </td>
+          </tr>
+          <tr>
+            <td colspan="2">
+              <label for="cellulare">Cellulare<span class="required">*</span></label>
+              <input class="form-control" name="cellulare" id="cellulare" />
+            </td>
+          </tr>
+
+          <!-- Residenza -->
+          <tr><td colspan="2" class="table-section-title">Residenza</td></tr>
+          <tr>
+            <td>
+              <label for="indirizzoResidenza">Indirizzo<span class="required">*</span></label>
+              <input class="form-control" name="indirizzoResidenza" id="indirizzoResidenza" />
+            </td>
+            <td>
+              <label for="capResidenza">Cap<span class="required">*</span></label>
+              <input class="form-control" name="capResidenza" id="capResidenza" />
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <label for="provinciaResidenza">Provincia<span class="required">*</span></label>
+              <input class="form-control" name="provinciaResidenza" id="provinciaResidenza" />
+            </td>
+            <td>
+              <label for="selectComuneResidenza">Comune<span class="required">*</span></label>
+              <select class="form-select" name="comuneResidenza" id="selectComuneResidenza">
+                <option value="">-- Seleziona --</option>
+              </select>
+            </td>
+          </tr>
+
+          <!-- Domicilio Uguale -->
+          <tr>
+            <td colspan="2">
+              <label>Domicilio uguale a residenza?</label><br/>
+              <div class="form-check form-check-inline">
+                <input type="radio" class="form-check-input" id="radioSi" name="domicilioUguale" value="Si" />
+                <label class="form-check-label" for="radioSi">Sì</label>
+              </div>
+              <div class="form-check form-check-inline">
+                <input type="radio" class="form-check-input" id="radioNo" name="domicilioUguale" value="No" />
+                <label class="form-check-label" for="radioNo">No</label>
+              </div>
+            </td>
+          </tr>
+
+          <!-- Domicilio (visibile solo se radioNo è selezionato) -->
+          <tbody id="domicilio" style="display: none;">
+          <tr><td colspan="2" class="table-section-title">Domicilio</td></tr>
+          <tr>
+            <td>
+              <label for="indirizzoDomicilio">Indirizzo<span class="required">*</span></label>
+              <input class="form-control" name="indirizzoDomicilio" id="indirizzoDomicilio" />
+            </td>
+            <td>
+              <label for="capDomicilio">Cap<span class="required">*</span></label>
+              <input class="form-control" name="capDomicilio" id="capDomicilio" />
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <label for="provinciaDomicilio">Provincia<span class="required">*</span></label>
+              <input class="form-control" name="provinciaDomicilio" id="provinciaDomicilio" />
+            </td>
+            <td>
+              <label for="selectComuneDomicilio">Comune</label>
+              <select class="form-select" name="comuneDomicilio" id="selectComuneDomicilio">
+                <option value="">-- Seleziona --</option>
+              </select>
+            </td>
+          </tr>
+          </tbody>
+        </table>
+
+        <!-- Bottone salva -->
+        <div class="text-center mt-4">
+          <button type="button" class="btn btn-success" id="salvaAna">SALVA</button>
+        </div>
+      </form>
+      <!-- Contenitore per il pulsante Aggiorna -->
+      <div id="formButtonContainer" class="text-center mt-4"></div>
+    </div>
+  </div>
+</section>
+</body>
+</html>

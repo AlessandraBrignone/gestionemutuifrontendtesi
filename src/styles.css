@@ -1,0 +1,54 @@
+.layout-wrapper {
+    min-height: 100vh;
+}
+
+.sidebar {
+    width: 250px;
+    transition: all 0.3s ease-in-out;
+    overflow-x: hidden;
+    {/*background: linear-gradient(135deg, #2e7d32, #a5d6a7);*/}
+    background: linear-gradient(135deg, #00796b, #80cbc4);
+    color: white;
+}
+
+{/*Sidebar chiusa*/}
+.sidebar.collapsed {
+    width: 60px;
+    {/*background: linear-gradient(135deg, #2e7d32, #a5d6a7);*/}
+    background: linear-gradient(135deg, #00796b, #80cbc4);
+}
+
+.sidebar .nav-link {
+    color: white;
+    padding: 0.75rem 1.25rem;
+    white-space: nowrap;
+    transition: padding 0.3s;
+}
+
+.sidebar.collapsed .nav-link {
+    padding-left: 1rem;
+    justify-content: center;
+}
+
+.sidebar .nav-link:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.sidebar .nav-link.active {
+    background-color: rgba(255, 255, 255, 0.2);
+    font-weight: bold;
+}
+
+{/*Lineette*/}
+.btn-custom-toggle {
+    {/*background: linear-gradient(135deg, #2e7d32, #a5d6a7);*/}
+    background: linear-gradient(135deg, #00796b, #80cbc4);
+    border: none;
+    color: white;
+}
+
+.btn-custom-toggle:hover {
+     {/*background: linear-gradient(135deg, #2e7d32, #a5d6a7);*/}
+     background: linear-gradient(135deg, #00796b, #80cbc4);
+    color: white;
+}
