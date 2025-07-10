@@ -120,9 +120,9 @@ const InserimentoRichiestaMutuo = ({onCompletamento, anagrafiche, formData, setF
     function handleAnnulla() {
         setShowInsert(false);
         setFormData({
-            durata: '',
             importo: '',
             importoRata: '',
+            durata: '',
             cadenzaRata: '',
             tipoMutuo: '',
             interesseAnnuo: '',
@@ -133,6 +133,9 @@ const InserimentoRichiestaMutuo = ({onCompletamento, anagrafiche, formData, setF
             dataRiscossione: '',
             valoreImmobile: '',
             redditoFamiliare: '',
+            posizioneLavorativaIn: '',
+            posizioneLavorativaCo: '',
+            posizioneLavorativaGa: '',
             componentiNucleoFamiliare: '',
             valoreBeniImmobili: '',
             valorePartecipazione: '',
@@ -290,9 +293,9 @@ const InserimentoRichiestaMutuo = ({onCompletamento, anagrafiche, formData, setF
                                 <label htmlFor="dataRiscossione" className="fw-bold text-dark d-block">Cadenza riscossione</label>
                                 <select
                                     className="form-select"
-                                    name="cadenzaRiscossione"
-                                    id="cadenzaRiscossione"
-                                    value={formData.durataRichiesta}
+                                    name="dataRiscossione"
+                                    id="dataRiscossione"
+                                    value={formData.dataRiscossione}
                                     onChange={handleChange}
                                     style={{ maxWidth: '250px' }}
                                 >
@@ -300,6 +303,7 @@ const InserimentoRichiestaMutuo = ({onCompletamento, anagrafiche, formData, setF
                                     <option value="1">1</option>
                                     <option value="5">5</option>
                                     <option value="10">10</option>
+                                    required
                                 </select>
                             </div>
                         </div>
@@ -405,7 +409,7 @@ const InserimentoRichiestaMutuo = ({onCompletamento, anagrafiche, formData, setF
                                     className="form-select"
                                     name="posizioneLavorativaIn"
                                     id="posizioneLavorativaIn"
-                                    value={formData.posizioneLavorativaIn}
+                                    value={formData.posizioneLavorativaIn || ''}
                                     onChange={handleChange}
                                 >
                                     <option value="">Seleziona una posizione lavorativa</option>
@@ -529,9 +533,9 @@ const InserimentoRichiestaMutuo = ({onCompletamento, anagrafiche, formData, setF
                                     <label html="posizioneLavorativaGa" className="fw-bold text-dark d-block">Posizione lavorativa garante</label>
                                     <select
                                         className="form-select"
-                                        name="posizioneLavorativaGarante"
+                                        name="posizioneLavorativaGa"
                                         id="posizioneLavorativaGa"
-                                        value={formData.posizioneLavorativaGarante || ''}
+                                        value={formData.posizioneLavorativaGa || ''}
                                         onChange={handleChange}
                                     >
                                         <option value="">Seleziona una posizione lavorativa</option>

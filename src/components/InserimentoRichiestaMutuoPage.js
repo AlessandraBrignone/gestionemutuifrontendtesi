@@ -18,13 +18,14 @@ export default function InserimentoRichiestaMutuoPage() {
       const [anagrafiche, setAnagrafiche] = useState([]);
 
       const [formData, setFormData] = useState({
-        idIntestatario: '', idCointestatario: '', idGarante: '',
-        importo: '', importoRata: '',
-        durata: '', cadenzaRata: '', tipoMutuo: '', interesseAnnuo: '',
-        pianoAmmortamento: '', spreadMutuo: '', statoRichiesta: '',
-        durataRichiesta: '', dataRiscossione: '', valoreImmobile: '',
-        redditoFamiliare: '', componentiNucleoFamiliare: '',
-        valoreBeniImmobili: '', valorePartecipazione: '', ultimoIsee: ''
+            idIntestatario: '', idCointestatario: '', idGarante: '',
+            importo: '', importoRata: '',
+            durata: '', cadenzaRata: '',dataRiscossione: '', tipoMutuo: '', interesseAnnuo: '',
+            pianoAmmortamento: '', spreadMutuo: '', statoRichiesta: '',
+            durataRichiesta: '', dataRiscossione: '', valoreImmobile: '',
+            redditoFamiliare: '', posizioneLavorativaIn: '', posizioneLavorativaCo: '',
+            posizioneLavorativaGa: '', componentiNucleoFamiliare: '',
+            valoreBeniImmobili: '', valorePartecipazione: '', ultimoIsee: ''
       });
 
       const [richiesta, setRichiesta] = useState(null);
