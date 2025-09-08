@@ -18,13 +18,24 @@ const Login = () => {
 
             if (response.data && response.data.token) {
                 // Salva il token nel contesto auth
-                login(response.data.token);
+                login(response.data.token, response.data.utente);
 
                 sessionStorage.setItem("token", response.data.token);
                 //SALVA L'UTENTE NEL LOCAL STORAGE
                 localStorage.setItem("utente", JSON.stringify(response.data.utente));
 
-                navigate("/");
+                // se è ADMIN vai alla gestione utenti, altrimenti alla home
+                const u = response.data.utente;
+                const roleCode =
+                    u?.ruolo?.codice ||
+                    (u?.ruolo?.descrizioneRuolo
+                        ? u.ruolo.descrizioneRuolo.toUpperCase().replace(/[^A-Z0-9]/g, "_")
+                        : "");
+                if (roleCode === "ADMIN") {
+                    navigate("/admin/utenti");
+                } else {
+                    navigate("/");
+                }
             } else {
                 throw new Error("Token non ricevuto");
             }
@@ -51,10 +62,12 @@ const Login = () => {
               <h2>Login</h2>
               <p className="text-muted">Sign in to your member area</p>
               <input
-                type="email"
-                placeholder="Email"
+                type="text"
+                placeholder="Email o username"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                autoComplete="username"
+                inputMode="email"
                 required
               />
               <input
