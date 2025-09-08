@@ -22,14 +22,19 @@ const GeneraPiano = ({ onCompletamento, richiesta, anagrafiche }) => {
     const [exportFormat, setExportFormat] = useState("pdf");
 
     //Formattazione euro per renderlo leggibile nel pdf
-    const formatEuro = (val) => {
-        return new Intl.NumberFormat('it-IT', {
-            style: 'currency',
-            currency: 'EUR',
-            minimumFractionDigits: 2
-        }).format(val);
+    const toNum = (v) => {
+      if (typeof v === 'string') {
+        // se arriva "1234,56" lo converto in "1234.56", altrimenti lo lascio
+        const s = v.includes(',') && !v.includes('.') ? v.replace(',', '.') : v;
+        const n = Number(s);
+        return isNaN(n) ? 0 : n;
+      }
+      const n = Number(v);
+      return isNaN(n) ? 0 : n;
     };
-
+    const formatEuro = (val) =>
+      new Intl.NumberFormat('it-IT', { style: 'currency', currency: 'EUR' })
+        .format(toNum(val));
 
     // Effetto per caricare dati Durata, cadenza rata e tipo mutuo
     useEffect(() => {
@@ -45,24 +50,18 @@ const GeneraPiano = ({ onCompletamento, richiesta, anagrafiche }) => {
 
     //Click su Genera piano ammortamento
     const genera = async () => {
-        setLoading(true);
-        try {
-            const body = {
-                richiestaId: richiesta.id,
-                piano: calcolaPianoConQuote()
-            };
-
-            const res = await axios.post(
-                "/genera_piano",
-                body
-            );
-
-            setPiano(res.data); // se il backend restituisce il piano salvato
-        } catch (err) {
-            Swal.fire("Errore", "Impossibile generare il piano", "error");
-        } finally {
-            setLoading(false);
-        }
+      setLoading(true);
+      try {
+        const res = await axios.post("/genera_piano", { richiestaId: richiesta.id });
+        setPiano(res.data);
+        setPaginaCorrente(1);
+      } catch (err) {
+        console.error("Genera piano - errore:", err);
+        const msg = err.response?.data?.error || err.response?.data || "Impossibile generare il piano";
+        Swal.fire("Errore", msg, "error");
+      } finally {
+        setLoading(false);
+      }
     };
 
     //Calcolo Piano ammortamento
@@ -88,64 +87,77 @@ const GeneraPiano = ({ onCompletamento, richiesta, anagrafiche }) => {
         let capitaleResiduo = importoTotale;
 
         for (let i = 1; i <= rateTotali; i++) {
-            const quotaInteressi = capitaleResiduo * tassoPeriodico;
-            const quotaCapitale = rataCostante - quotaInteressi;
-            capitaleResiduo -= quotaCapitale;
+          const quotaInteressi = capitaleResiduo * tassoPeriodico;
+          const quotaCapitale = rataCostante - quotaInteressi;
+          const totaleRata = quotaInteressi + quotaCapitale;   // <--- NEW
+          capitaleResiduo -= quotaCapitale;
 
-            nuovoPiano.push({
-                idMutuo: richiesta.id,
-                numeroRata: i,
-                quotaInteressi: quotaInteressi.toFixed(2),
-                quotaCapitale: quotaCapitale.toFixed(2),
-                capitaleResiduo: capitaleResiduo > 0 ? capitaleResiduo.toFixed(2) : '0.00',
-            });
+          nuovoPiano.push({
+            idMutuo: richiesta.id,
+            numeroRata: i,
+            quotaInteressi: quotaInteressi.toFixed(2),
+            quotaCapitale: quotaCapitale.toFixed(2),
+            totaleRata: totaleRata.toFixed(2),                 // <--- NEW
+            capitaleResiduo: capitaleResiduo > 0 ? capitaleResiduo.toFixed(2) : '0.00',
+          });
         }
 
         return nuovoPiano;
     };
 
-    const pianoCalcolato = useMemo(() => calcolaPianoConQuote(), [richiesta, durataSelezionata, cadenzaSelezionata]);
-    const totalePagine = Math.ceil(pianoCalcolato.length / righePerPagina);
-    const righeMostrate = pianoCalcolato.slice((paginaCorrente - 1) * righePerPagina, paginaCorrente * righePerPagina);
+    const pianoCalcolato = useMemo(
+    () => calcolaPianoConQuote(),
+    [richiesta, durataSelezionata, cadenzaSelezionata]
+    );
+
+    const pianoDaMostrare = useMemo(
+      () => (piano?.length ? piano : pianoCalcolato),
+      [piano, pianoCalcolato]
+    );
+    const totalePagine = Math.max(1, Math.ceil(pianoDaMostrare.length / righePerPagina));
+    const righeMostrate = pianoDaMostrare.slice(
+      (paginaCorrente - 1) * righePerPagina,
+      paginaCorrente * righePerPagina
+    );
 
     //Funzione per l'esportazione
     const handleEsporta = () => {
         setShowExportModal(false);
 
         if (exportFormat === "pdf") {
-            const doc = new jsPDF();
-
-            doc.text("Piano Ammortamento", 14, 10);
-            autoTable(doc, {
-                startY: 20,
-                head: [['#', 'Quota Interessi', 'Quota Capitale', 'Capitale Residuo']],
-                body: pianoCalcolato.map((riga) => [
-                    riga.numeroRata,
-                    formatEuro(riga.quotaInteressi),
-                    formatEuro(riga.quotaCapitale),
-                    formatEuro(riga.capitaleResiduo),
-                ])
-            });
-
-            doc.save(`PianoAmmortamento_${richiesta.id}.pdf`);
+          const doc = new jsPDF();
+          doc.text("Piano Ammortamento", 14, 10);
+          autoTable(doc, {
+            startY: 20,
+            head: [['#', 'Totale Rata', 'Quota Interessi', 'Quota Capitale', 'Capitale Residuo']],
+            body: pianoDaMostrare.map((riga) => [
+              riga.numeroRata,
+              formatEuro(riga.totaleRata),
+              formatEuro(riga.quotaInteressi),
+              formatEuro(riga.quotaCapitale),
+              formatEuro(riga.capitaleResiduo),
+            ])
+          });
+          doc.save(`PianoAmmortamento_${richiesta.id}.pdf`);
         }
 
         if (exportFormat === "excel") {
-            const ws = XLSX.utils.json_to_sheet(
-                pianoCalcolato.map((riga) => ({
-                    "Numero Rata": riga.numeroRata,
-                    "Quota Interessi": parseFloat(riga.quotaInteressi),
-                    "Quota Capitale": parseFloat(riga.quotaCapitale),
-                    "Capitale Residuo": parseFloat(riga.capitaleResiduo),
-                }))
-            );
+          const ws = XLSX.utils.json_to_sheet(
+            pianoDaMostrare.map((riga) => ({
+              "Numero Rata": riga.numeroRata,
+              "Totale Rata": parseFloat(riga.totaleRata),       // NEW
+              "Quota Interessi": parseFloat(riga.quotaInteressi),
+              "Quota Capitale": parseFloat(riga.quotaCapitale),
+              "Capitale Residuo": parseFloat(riga.capitaleResiduo),
+            }))
+          );
 
-            const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, "Piano Ammortamento");
+          const wb = XLSX.utils.book_new();
+          XLSX.utils.book_append_sheet(wb, ws, "Piano Ammortamento");
 
-            const excelBuffer = XLSX.write(wb, { bookType: "xlsx", type: "array" });
-            const data = new Blob([excelBuffer], { type: "application/octet-stream" });
-            saveAs(data, `PianoAmmortamento_${richiesta.id}.xlsx`);
+          const excelBuffer = XLSX.write(wb, { bookType: "xlsx", type: "array" });
+          const data = new Blob([excelBuffer], { type: "application/octet-stream" });
+          saveAs(data, `PianoAmmortamento_${richiesta.id}.xlsx`);
         }
     };
 
@@ -256,25 +268,27 @@ const GeneraPiano = ({ onCompletamento, richiesta, anagrafiche }) => {
                 {loading ? "Calcolo…" : "Genera piano di ammortamento"}
             </button>
 
-            {piano.length > 0 && (
+            {pianoDaMostrare.length > 0 && (
                 <div className="table-responsive mt-4">
                     <h5>Piano Ammortamento</h5>
                     <table className="table table-bordered">
                         <thead className="table-light">
-                        <tr>
-                            <th>Numero Rata</th>
-                            <th>Quota Interessi</th>
-                            <th>Quota Capitale</th>
-                            <th>Capitale Residuo</th>
-                        </tr>
+                            <tr>
+                                <th>Numero Rata</th>
+                                <th>Totale Rata</th>
+                                <th>Quota Interessi</th>
+                                <th>Quota Capitale</th>
+                                <th>Capitale Residuo</th>
+                            </tr>
                         </thead>
                         <tbody>
                         {righeMostrate.map((riga, idx) => (
                             <tr key={idx}>
                                 <td>{riga.numeroRata}</td>
-                                <td>{new Intl.NumberFormat('it-IT', { style: 'currency', currency: 'EUR' }).format(riga.quotaInteressi)}</td>
-                                <td>{new Intl.NumberFormat('it-IT', { style: 'currency', currency: 'EUR' }).format(riga.quotaCapitale)}</td>
-                                <td>{new Intl.NumberFormat('it-IT', { style: 'currency', currency: 'EUR' }).format(riga.capitaleResiduo)}</td>
+                                <td>{formatEuro(riga.totaleRata)}</td>
+                                <td>{formatEuro(riga.quotaInteressi)}</td>
+                                <td>{formatEuro(riga.quotaCapitale)}</td>
+                                <td>{formatEuro(riga.capitaleResiduo)}</td>
                             </tr>
                         ))}
                         </tbody>
@@ -283,7 +297,6 @@ const GeneraPiano = ({ onCompletamento, richiesta, anagrafiche }) => {
                     <nav className="d-flex justify-content-center mt-3">
                         <ul className="pagination">
 
-                            {/* « precedente */}
                             <li className={`page-item ${paginaCorrente === 1 ? "disabled" : ""}`}>
                                 <button className="page-link"
                                         onClick={() => setPaginaCorrente(paginaCorrente - 1)}>
@@ -291,7 +304,6 @@ const GeneraPiano = ({ onCompletamento, richiesta, anagrafiche }) => {
                                 </button>
                             </li>
 
-                            {/* numeri + puntini */}
                             {getPageItems(totalePagine, paginaCorrente).map((item, idx) =>
                                 item === '...' ? (
                                     <li key={`dots-${idx}`} className="page-item disabled">
@@ -307,7 +319,6 @@ const GeneraPiano = ({ onCompletamento, richiesta, anagrafiche }) => {
                                 )
                             )}
 
-                            {/* successivo » */}
                             <li className={`page-item ${paginaCorrente === totalePagine ? "disabled" : ""}`}>
                                 <button className="page-link"
                                         onClick={() => setPaginaCorrente(paginaCorrente + 1)}>
@@ -318,7 +329,7 @@ const GeneraPiano = ({ onCompletamento, richiesta, anagrafiche }) => {
                         </ul>
                     </nav>
 
-                    {/*Bottoni*/}
+                    {/*Button*/}
                     <div className="d-flex justify-content-center gap-3 mt-4">
                         <button className="btn btn-outline-primary" onClick={() => setShowExportModal(true)}>Esporta</button>
                         <button className="btn btn-success" onClick={handleInviaRichiesta}>Invia richiesta</button>
