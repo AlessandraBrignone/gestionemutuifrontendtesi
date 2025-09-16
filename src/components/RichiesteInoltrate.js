@@ -484,16 +484,16 @@ const RichiesteInoltrate = () => {
                                                                 </button>
 
                                                                 {/*Button: Rifiuta richiesta*/}
-                                                                <button
-                                                                    className="btn btn-sm btn-outline-danger rounded-circle"
-                                                                    title="Rifiuta richiesta"
-                                                                    title="Rifiuta richiesta"
-                                                                    type="button"
-                                                                    onClick={() => {
-                                                                        setRichiestaSelezionata(r);
-                                                                        setShowRifiutoModal(true);
-                                                                    }}
-                                                                >
+                                                                    <button
+                                                                        className="btn btn-sm btn-outline-danger rounded-circle"
+                                                                        title="Rifiuta richiesta"
+                                                                        title="Rifiuta richiesta"
+                                                                        type="button"
+                                                                        onClick={() => {
+                                                                            setRichiestaSelezionata(r);
+                                                                            setShowRifiutoModal(true);
+                                                                        }}
+                                                                    >
                                                                     <i className="fas fa-solid fa-xmark" aria-hidden="true"></i>
                                                                 </button>
                                                              </>
@@ -560,13 +560,13 @@ const RichiesteInoltrate = () => {
                                                         </>
                                                         )}
                                                         {r.statoRichiesta === "VALIDATO" && (
-                                                          <button
-                                                            className="btn btn-sm btn-outline-primary rounded-circle"
-                                                            aria-label="Clicca per estrarre il pdf"
-                                                            title="Clicca per estrarre il pdf"
-                                                            type="button"
-                                                            onClick={() => handleDownloadPdf(r.id)}
-                                                          >
+                                                            <button
+                                                                className="btn btn-sm btn-outline-primary rounded-circle"
+                                                                aria-label="Clicca per estrarre il pdf"
+                                                                title="Clicca per estrarre il pdf"
+                                                                type="button"
+                                                                onClick={() => handleDownloadPdf(r.id)}
+                                                            >
                                                             <i className="fas fa-solid fa-file-pdf" aria-hidden="true"></i>
                                                           </button>
                                                         )}
